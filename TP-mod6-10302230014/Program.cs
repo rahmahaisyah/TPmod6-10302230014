@@ -9,6 +9,9 @@
 
         public SayaTubeVideo(string title)
         {
+            if (title == null || title.Length > 100)
+                throw new ArgumentException("Judul video tidak boleh null dan maksimal 100 karakter.");
+
             Random rand = new Random();
             this.id = rand.Next(10000, 99999);
             this.title = title;
@@ -17,7 +20,20 @@
 
         public void IncreasePlayCount(int count)
         {
-            this.playCount += count;
+            if (count > 10000000)
+                throw new ArgumentException("Penambahan play count maksimal 10.000.000 per panggilan.");
+
+            try
+            {
+                checked
+                {
+                    this.playCount += count;
+                }
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: Play count melebihi batas maksimum integer!");
+            }
         }
 
         public void PrintVideoDetails()
@@ -32,9 +48,21 @@
     {
         static void Main(string[] args)
         {
-            SayaTubeVideo video = new SayaTubeVideo("Tutorial Design By Contract - [Rahmah Aisyah]");
-            video.IncreasePlayCount(10);
-            video.PrintVideoDetails();
+            try
+            {
+                SayaTubeVideo video = new SayaTubeVideo("Tutorial Design By Contract - [Rahmah Aisyah]");
+
+                for (int i = 0; i < 100; i++)
+                {
+                    video.IncreasePlayCount(10000000);
+                }
+
+                video.PrintVideoDetails();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Terjadi kesalahan: " + ex.Message);
+            }
         }
     }
 }
